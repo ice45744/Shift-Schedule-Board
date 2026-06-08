@@ -6,9 +6,6 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface Location {
-  id: number;
-  name: string;
-  maxSlots: number;
-  createdAt: string;
+export interface AutoAssignInput {
+  locationId: number;
 }

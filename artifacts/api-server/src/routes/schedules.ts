@@ -2,42 +2,28 @@ import { Router } from "express";
 import { db } from "@workspace/db";
 import { schedulesTable, assignmentsTable, membersTable, locationsTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
-import {
-  CreateScheduleBody,
-  GetScheduleParams,
-  DeleteScheduleParams,
-} from "@workspace/api-zod";
+import { CreateScheduleBody, GetScheduleParams, DeleteScheduleParams } from "@workspace/api-zod";
 
 const router = Router();
 
-router.get("/schedules", async (req, res) => {
+router.get("/schedules", async (_req, res) => {
   const schedules = await db.select().from(schedulesTable).orderBy(schedulesTable.createdAt);
   res.json(schedules.map((s) => ({ ...s, createdAt: s.createdAt.toISOString() })));
 });
 
 router.post("/schedules", async (req, res) => {
   const parsed = CreateScheduleBody.safeParse(req.body);
-  if (!parsed.success) {
-    return res.status(400).json({ error: "Invalid input" });
-  }
+  if (!parsed.success) { res.status(400).json({ error: "Invalid input" }); return; }
   const [schedule] = await db.insert(schedulesTable).values(parsed.data).returning();
   res.status(201).json({ ...schedule, createdAt: schedule.createdAt.toISOString() });
 });
 
 router.get("/schedules/:id", async (req, res) => {
   const parsed = GetScheduleParams.safeParse({ id: Number(req.params.id) });
-  if (!parsed.success) {
-    return res.status(400).json({ error: "Invalid id" });
-  }
+  if (!parsed.success) { res.status(400).json({ error: "Invalid id" }); return; }
 
-  const [schedule] = await db
-    .select()
-    .from(schedulesTable)
-    .where(eq(schedulesTable.id, parsed.data.id));
-
-  if (!schedule) {
-    return res.status(404).json({ error: "Schedule not found" });
-  }
+  const [schedule] = await db.select().from(schedulesTable).where(eq(schedulesTable.id, parsed.data.id));
+  if (!schedule) { res.status(404).json({ error: "Schedule not found" }); return; }
 
   const assignments = await db
     .select({
@@ -55,18 +41,12 @@ router.get("/schedules/:id", async (req, res) => {
     .innerJoin(locationsTable, eq(assignmentsTable.locationId, locationsTable.id))
     .where(eq(assignmentsTable.scheduleId, parsed.data.id));
 
-  res.json({
-    ...schedule,
-    createdAt: schedule.createdAt.toISOString(),
-    assignments,
-  });
+  res.json({ ...schedule, createdAt: schedule.createdAt.toISOString(), assignments });
 });
 
 router.delete("/schedules/:id", async (req, res) => {
   const parsed = DeleteScheduleParams.safeParse({ id: Number(req.params.id) });
-  if (!parsed.success) {
-    return res.status(400).json({ error: "Invalid id" });
-  }
+  if (!parsed.success) { res.status(400).json({ error: "Invalid id" }); return; }
   await db.delete(schedulesTable).where(eq(schedulesTable.id, parsed.data.id));
   res.status(204).send();
 });

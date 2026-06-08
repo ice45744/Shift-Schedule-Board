@@ -22,9 +22,11 @@ import type {
 import type {
   Assignment,
   AssignmentInput,
+  AutoAssignInput,
   HealthStatus,
   Location,
   LocationInput,
+  LocationPatch,
   Member,
   MemberInput,
   Schedule,
@@ -129,9 +131,6 @@ export const getListMembersUrl = () => {
   return `/api/members`
 }
 
-/**
- * @summary List all staff members
- */
 export const listMembers = async ( options?: RequestInit): Promise<Member[]> => {
 
   return customFetch<Member[]>(getListMembersUrl(),
@@ -176,9 +175,6 @@ export type ListMembersQueryResult = NonNullable<Awaited<ReturnType<typeof listM
 export type ListMembersQueryError = ErrorType<unknown>
 
 
-/**
- * @summary List all staff members
- */
 
 export function useListMembers<TData = Awaited<ReturnType<typeof listMembers>>, TError = ErrorType<unknown>>(
   options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listMembers>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
@@ -206,9 +202,6 @@ export const getCreateMemberUrl = () => {
   return `/api/members`
 }
 
-/**
- * @summary Create a new staff member
- */
 export const createMember = async (memberInput: MemberInput, options?: RequestInit): Promise<Member> => {
 
   return customFetch<Member>(getCreateMemberUrl(),
@@ -255,10 +248,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type CreateMemberMutationBody = BodyType<MemberInput>
     export type CreateMemberMutationError = ErrorType<unknown>
 
-    /**
- * @summary Create a new staff member
- */
-export const useCreateMember = <TError = ErrorType<unknown>,
+    export const useCreateMember = <TError = ErrorType<unknown>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createMember>>, TError,{data: BodyType<MemberInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
  ): UseMutationResult<
         Awaited<ReturnType<typeof createMember>>,
@@ -277,9 +267,6 @@ export const getDeleteMemberUrl = (id: number,) => {
   return `/api/members/${id}`
 }
 
-/**
- * @summary Delete a staff member
- */
 export const deleteMember = async (id: number, options?: RequestInit): Promise<void> => {
 
   return customFetch<void>(getDeleteMemberUrl(id),
@@ -325,10 +312,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type DeleteMemberMutationError = ErrorType<unknown>
 
-    /**
- * @summary Delete a staff member
- */
-export const useDeleteMember = <TError = ErrorType<unknown>,
+    export const useDeleteMember = <TError = ErrorType<unknown>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteMember>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
  ): UseMutationResult<
         Awaited<ReturnType<typeof deleteMember>>,
@@ -347,9 +331,6 @@ export const getListLocationsUrl = () => {
   return `/api/locations`
 }
 
-/**
- * @summary List all locations
- */
 export const listLocations = async ( options?: RequestInit): Promise<Location[]> => {
 
   return customFetch<Location[]>(getListLocationsUrl(),
@@ -394,9 +375,6 @@ export type ListLocationsQueryResult = NonNullable<Awaited<ReturnType<typeof lis
 export type ListLocationsQueryError = ErrorType<unknown>
 
 
-/**
- * @summary List all locations
- */
 
 export function useListLocations<TData = Awaited<ReturnType<typeof listLocations>>, TError = ErrorType<unknown>>(
   options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listLocations>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
@@ -424,9 +402,6 @@ export const getCreateLocationUrl = () => {
   return `/api/locations`
 }
 
-/**
- * @summary Create a new location
- */
 export const createLocation = async (locationInput: LocationInput, options?: RequestInit): Promise<Location> => {
 
   return customFetch<Location>(getCreateLocationUrl(),
@@ -473,10 +448,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type CreateLocationMutationBody = BodyType<LocationInput>
     export type CreateLocationMutationError = ErrorType<unknown>
 
-    /**
- * @summary Create a new location
- */
-export const useCreateLocation = <TError = ErrorType<unknown>,
+    export const useCreateLocation = <TError = ErrorType<unknown>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createLocation>>, TError,{data: BodyType<LocationInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
  ): UseMutationResult<
         Awaited<ReturnType<typeof createLocation>>,
@@ -487,6 +459,72 @@ export const useCreateLocation = <TError = ErrorType<unknown>,
       return useMutation(getCreateLocationMutationOptions(options));
     }
 
+export const getUpdateLocationUrl = (id: number,) => {
+
+
+
+
+  return `/api/locations/${id}`
+}
+
+export const updateLocation = async (id: number,
+    locationPatch: LocationPatch, options?: RequestInit): Promise<Location> => {
+
+  return customFetch<Location>(getUpdateLocationUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      locationPatch,)
+  }
+);}
+
+
+
+
+export const getUpdateLocationMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateLocation>>, TError,{id: number;data: BodyType<LocationPatch>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateLocation>>, TError,{id: number;data: BodyType<LocationPatch>}, TContext> => {
+
+const mutationKey = ['updateLocation'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateLocation>>, {id: number;data: BodyType<LocationPatch>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateLocation(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateLocationMutationResult = NonNullable<Awaited<ReturnType<typeof updateLocation>>>
+    export type UpdateLocationMutationBody = BodyType<LocationPatch>
+    export type UpdateLocationMutationError = ErrorType<unknown>
+
+    export const useUpdateLocation = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateLocation>>, TError,{id: number;data: BodyType<LocationPatch>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateLocation>>,
+        TError,
+        {id: number;data: BodyType<LocationPatch>},
+        TContext
+      > => {
+      return useMutation(getUpdateLocationMutationOptions(options));
+    }
+
 export const getDeleteLocationUrl = (id: number,) => {
 
 
@@ -495,9 +533,6 @@ export const getDeleteLocationUrl = (id: number,) => {
   return `/api/locations/${id}`
 }
 
-/**
- * @summary Delete a location
- */
 export const deleteLocation = async (id: number, options?: RequestInit): Promise<void> => {
 
   return customFetch<void>(getDeleteLocationUrl(id),
@@ -543,10 +578,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type DeleteLocationMutationError = ErrorType<unknown>
 
-    /**
- * @summary Delete a location
- */
-export const useDeleteLocation = <TError = ErrorType<unknown>,
+    export const useDeleteLocation = <TError = ErrorType<unknown>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteLocation>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
  ): UseMutationResult<
         Awaited<ReturnType<typeof deleteLocation>>,
@@ -565,9 +597,6 @@ export const getListSchedulesUrl = () => {
   return `/api/schedules`
 }
 
-/**
- * @summary List all schedule sheets
- */
 export const listSchedules = async ( options?: RequestInit): Promise<Schedule[]> => {
 
   return customFetch<Schedule[]>(getListSchedulesUrl(),
@@ -612,9 +641,6 @@ export type ListSchedulesQueryResult = NonNullable<Awaited<ReturnType<typeof lis
 export type ListSchedulesQueryError = ErrorType<unknown>
 
 
-/**
- * @summary List all schedule sheets
- */
 
 export function useListSchedules<TData = Awaited<ReturnType<typeof listSchedules>>, TError = ErrorType<unknown>>(
   options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listSchedules>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
@@ -642,9 +668,6 @@ export const getCreateScheduleUrl = () => {
   return `/api/schedules`
 }
 
-/**
- * @summary Create a new schedule sheet
- */
 export const createSchedule = async (scheduleInput: ScheduleInput, options?: RequestInit): Promise<Schedule> => {
 
   return customFetch<Schedule>(getCreateScheduleUrl(),
@@ -691,10 +714,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type CreateScheduleMutationBody = BodyType<ScheduleInput>
     export type CreateScheduleMutationError = ErrorType<unknown>
 
-    /**
- * @summary Create a new schedule sheet
- */
-export const useCreateSchedule = <TError = ErrorType<unknown>,
+    export const useCreateSchedule = <TError = ErrorType<unknown>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSchedule>>, TError,{data: BodyType<ScheduleInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
  ): UseMutationResult<
         Awaited<ReturnType<typeof createSchedule>>,
@@ -713,9 +733,6 @@ export const getGetScheduleUrl = (id: number,) => {
   return `/api/schedules/${id}`
 }
 
-/**
- * @summary Get a schedule sheet with all assignments
- */
 export const getSchedule = async (id: number, options?: RequestInit): Promise<ScheduleDetail> => {
 
   return customFetch<ScheduleDetail>(getGetScheduleUrl(id),
@@ -760,9 +777,6 @@ export type GetScheduleQueryResult = NonNullable<Awaited<ReturnType<typeof getSc
 export type GetScheduleQueryError = ErrorType<void>
 
 
-/**
- * @summary Get a schedule sheet with all assignments
- */
 
 export function useGetSchedule<TData = Awaited<ReturnType<typeof getSchedule>>, TError = ErrorType<void>>(
  id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSchedule>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
@@ -790,9 +804,6 @@ export const getDeleteScheduleUrl = (id: number,) => {
   return `/api/schedules/${id}`
 }
 
-/**
- * @summary Delete a schedule sheet
- */
 export const deleteSchedule = async (id: number, options?: RequestInit): Promise<void> => {
 
   return customFetch<void>(getDeleteScheduleUrl(id),
@@ -838,10 +849,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type DeleteScheduleMutationError = ErrorType<unknown>
 
-    /**
- * @summary Delete a schedule sheet
- */
-export const useDeleteSchedule = <TError = ErrorType<unknown>,
+    export const useDeleteSchedule = <TError = ErrorType<unknown>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteSchedule>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
  ): UseMutationResult<
         Awaited<ReturnType<typeof deleteSchedule>>,
@@ -852,6 +860,78 @@ export const useDeleteSchedule = <TError = ErrorType<unknown>,
       return useMutation(getDeleteScheduleMutationOptions(options));
     }
 
+export const getAutoAssignUrl = (scheduleId: number,) => {
+
+
+
+
+  return `/api/schedules/${scheduleId}/auto-assign`
+}
+
+/**
+ * @summary Auto-assign members to a location for the week (no duplicates)
+ */
+export const autoAssign = async (scheduleId: number,
+    autoAssignInput: AutoAssignInput, options?: RequestInit): Promise<ScheduleDetail> => {
+
+  return customFetch<ScheduleDetail>(getAutoAssignUrl(scheduleId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      autoAssignInput,)
+  }
+);}
+
+
+
+
+export const getAutoAssignMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof autoAssign>>, TError,{scheduleId: number;data: BodyType<AutoAssignInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof autoAssign>>, TError,{scheduleId: number;data: BodyType<AutoAssignInput>}, TContext> => {
+
+const mutationKey = ['autoAssign'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof autoAssign>>, {scheduleId: number;data: BodyType<AutoAssignInput>}> = (props) => {
+          const {scheduleId,data} = props ?? {};
+
+          return  autoAssign(scheduleId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AutoAssignMutationResult = NonNullable<Awaited<ReturnType<typeof autoAssign>>>
+    export type AutoAssignMutationBody = BodyType<AutoAssignInput>
+    export type AutoAssignMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Auto-assign members to a location for the week (no duplicates)
+ */
+export const useAutoAssign = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof autoAssign>>, TError,{scheduleId: number;data: BodyType<AutoAssignInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof autoAssign>>,
+        TError,
+        {scheduleId: number;data: BodyType<AutoAssignInput>},
+        TContext
+      > => {
+      return useMutation(getAutoAssignMutationOptions(options));
+    }
+
 export const getCreateAssignmentUrl = (scheduleId: number,) => {
 
 
@@ -860,9 +940,6 @@ export const getCreateAssignmentUrl = (scheduleId: number,) => {
   return `/api/schedules/${scheduleId}/assignments`
 }
 
-/**
- * @summary Assign a member to a location/day slot
- */
 export const createAssignment = async (scheduleId: number,
     assignmentInput: AssignmentInput, options?: RequestInit): Promise<Assignment> => {
 
@@ -910,10 +987,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type CreateAssignmentMutationBody = BodyType<AssignmentInput>
     export type CreateAssignmentMutationError = ErrorType<unknown>
 
-    /**
- * @summary Assign a member to a location/day slot
- */
-export const useCreateAssignment = <TError = ErrorType<unknown>,
+    export const useCreateAssignment = <TError = ErrorType<unknown>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAssignment>>, TError,{scheduleId: number;data: BodyType<AssignmentInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
  ): UseMutationResult<
         Awaited<ReturnType<typeof createAssignment>>,
@@ -933,9 +1007,6 @@ export const getDeleteAssignmentUrl = (scheduleId: number,
   return `/api/schedules/${scheduleId}/assignments/${id}`
 }
 
-/**
- * @summary Remove a member from a slot
- */
 export const deleteAssignment = async (scheduleId: number,
     id: number, options?: RequestInit): Promise<void> => {
 
@@ -982,10 +1053,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type DeleteAssignmentMutationError = ErrorType<unknown>
 
-    /**
- * @summary Remove a member from a slot
- */
-export const useDeleteAssignment = <TError = ErrorType<unknown>,
+    export const useDeleteAssignment = <TError = ErrorType<unknown>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAssignment>>, TError,{scheduleId: number;id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
  ): UseMutationResult<
         Awaited<ReturnType<typeof deleteAssignment>>,

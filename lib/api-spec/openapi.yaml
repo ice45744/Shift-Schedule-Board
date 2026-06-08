@@ -1,23 +1,16 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
   description: Duty scheduler API
 servers:
   - url: /api
-    description: Base API path
 tags:
   - name: health
-    description: Health operations
   - name: members
-    description: Staff member operations
   - name: locations
-    description: Location operations
   - name: schedules
-    description: Schedule sheet operations
   - name: assignments
-    description: Assignment operations
 paths:
   /healthz:
     get:
@@ -36,7 +29,6 @@ paths:
     get:
       operationId: listMembers
       tags: [members]
-      summary: List all staff members
       responses:
         "200":
           description: List of members
@@ -49,7 +41,6 @@ paths:
     post:
       operationId: createMember
       tags: [members]
-      summary: Create a new staff member
       requestBody:
         required: true
         content:
@@ -58,7 +49,7 @@ paths:
               $ref: "#/components/schemas/MemberInput"
       responses:
         "201":
-          description: Created member
+          description: Created
           content:
             application/json:
               schema:
@@ -68,7 +59,6 @@ paths:
     delete:
       operationId: deleteMember
       tags: [members]
-      summary: Delete a staff member
       parameters:
         - name: id
           in: path
@@ -83,7 +73,6 @@ paths:
     get:
       operationId: listLocations
       tags: [locations]
-      summary: List all locations
       responses:
         "200":
           description: List of locations
@@ -96,7 +85,6 @@ paths:
     post:
       operationId: createLocation
       tags: [locations]
-      summary: Create a new location
       requestBody:
         required: true
         content:
@@ -105,17 +93,38 @@ paths:
               $ref: "#/components/schemas/LocationInput"
       responses:
         "201":
-          description: Created location
+          description: Created
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Location"
 
   /locations/{id}:
+    patch:
+      operationId: updateLocation
+      tags: [locations]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LocationPatch"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Location"
     delete:
       operationId: deleteLocation
       tags: [locations]
-      summary: Delete a location
       parameters:
         - name: id
           in: path
@@ -130,7 +139,6 @@ paths:
     get:
       operationId: listSchedules
       tags: [schedules]
-      summary: List all schedule sheets
       responses:
         "200":
           description: List of schedules
@@ -143,7 +151,6 @@ paths:
     post:
       operationId: createSchedule
       tags: [schedules]
-      summary: Create a new schedule sheet
       requestBody:
         required: true
         content:
@@ -152,7 +159,7 @@ paths:
               $ref: "#/components/schemas/ScheduleInput"
       responses:
         "201":
-          description: Created schedule
+          description: Created
           content:
             application/json:
               schema:
@@ -162,7 +169,6 @@ paths:
     get:
       operationId: getSchedule
       tags: [schedules]
-      summary: Get a schedule sheet with all assignments
       parameters:
         - name: id
           in: path
@@ -181,7 +187,6 @@ paths:
     delete:
       operationId: deleteSchedule
       tags: [schedules]
-      summary: Delete a schedule sheet
       parameters:
         - name: id
           in: path
@@ -192,11 +197,35 @@ paths:
         "204":
           description: Deleted
 
+  /schedules/{scheduleId}/auto-assign:
+    post:
+      operationId: autoAssign
+      tags: [assignments]
+      summary: Auto-assign members to a location for the week (no duplicates)
+      parameters:
+        - name: scheduleId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AutoAssignInput"
+      responses:
+        "200":
+          description: Updated schedule detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScheduleDetail"
+
   /schedules/{scheduleId}/assignments:
     post:
       operationId: createAssignment
       tags: [assignments]
-      summary: Assign a member to a location/day slot
       parameters:
         - name: scheduleId
           in: path
@@ -211,7 +240,7 @@ paths:
               $ref: "#/components/schemas/AssignmentInput"
       responses:
         "201":
-          description: Created assignment
+          description: Created
           content:
             application/json:
               schema:
@@ -221,7 +250,6 @@ paths:
     delete:
       operationId: deleteAssignment
       tags: [assignments]
-      summary: Remove a member from a slot
       parameters:
         - name: scheduleId
           in: path
@@ -244,8 +272,7 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
     Member:
       type: object
@@ -272,12 +299,14 @@ components:
 
     Location:
       type: object
-      required: [id, name, createdAt]
+      required: [id, name, maxSlots, createdAt]
       properties:
         id:
           type: integer
         name:
           type: string
+        maxSlots:
+          type: integer
         createdAt:
           type: string
 
@@ -288,6 +317,21 @@ components:
         name:
           type: string
           minLength: 1
+        maxSlots:
+          type: integer
+          minimum: 1
+          maximum: 20
+
+    LocationPatch:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        maxSlots:
+          type: integer
+          minimum: 1
+          maximum: 20
 
     Schedule:
       type: object
@@ -343,7 +387,6 @@ components:
           type: integer
         dayOfWeek:
           type: integer
-          description: "1=Monday, 2=Tuesday, 3=Wednesday, 4=Thursday, 5=Friday"
 
     AssignmentInput:
       type: object
@@ -354,6 +397,13 @@ components:
         locationId:
           type: integer
         dayOfWeek:
+          type: integer
+
+    AutoAssignInput:
+      type: object
+      required: [locationId]
+      properties:
+        locationId:
           type: integer
 
     AssignmentWithDetails:

@@ -26,12 +26,28 @@ export interface MemberInput {
 export interface Location {
   id: number;
   name: string;
+  maxSlots: number;
   createdAt: string;
 }
 
 export interface LocationInput {
   /** @minLength 1 */
   name: string;
+  /**
+     * @minimum 1
+     * @maximum 20
+     */
+  maxSlots?: number;
+}
+
+export interface LocationPatch {
+  /** @minLength 1 */
+  name?: string;
+  /**
+     * @minimum 1
+     * @maximum 20
+     */
+  maxSlots?: number;
 }
 
 export interface Schedule {
@@ -74,7 +90,6 @@ export interface Assignment {
   scheduleId: number;
   memberId: number;
   locationId: number;
-  /** 1=Monday, 2=Tuesday, 3=Wednesday, 4=Thursday, 5=Friday */
   dayOfWeek: number;
 }
 
@@ -82,5 +97,9 @@ export interface AssignmentInput {
   memberId: number;
   locationId: number;
   dayOfWeek: number;
+}
+
+export interface AutoAssignInput {
+  locationId: number;
 }
 

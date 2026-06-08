@@ -16,9 +16,6 @@ export const HealthCheckResponse = zod.object({
 })
 
 
-/**
- * @summary List all staff members
- */
 export const ListMembersResponseItem = zod.object({
   "id": zod.number(),
   "name": zod.string(),
@@ -28,9 +25,6 @@ export const ListMembersResponseItem = zod.object({
 export const ListMembersResponse = zod.array(ListMembersResponseItem)
 
 
-/**
- * @summary Create a new staff member
- */
 
 
 
@@ -40,47 +34,58 @@ export const CreateMemberBody = zod.object({
 })
 
 
-/**
- * @summary Delete a staff member
- */
 export const DeleteMemberParams = zod.object({
   "id": zod.coerce.number()
 })
 
 
-/**
- * @summary List all locations
- */
 export const ListLocationsResponseItem = zod.object({
   "id": zod.number(),
   "name": zod.string(),
+  "maxSlots": zod.number(),
   "createdAt": zod.string()
 })
 export const ListLocationsResponse = zod.array(ListLocationsResponseItem)
 
 
-/**
- * @summary Create a new location
- */
+
+export const createLocationBodyMaxSlotsMax = 20;
 
 
 
 export const CreateLocationBody = zod.object({
-  "name": zod.string().min(1)
+  "name": zod.string().min(1),
+  "maxSlots": zod.number().min(1).max(createLocationBodyMaxSlotsMax).optional()
 })
 
 
-/**
- * @summary Delete a location
- */
+export const UpdateLocationParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+export const updateLocationBodyMaxSlotsMax = 20;
+
+
+
+export const UpdateLocationBody = zod.object({
+  "name": zod.string().min(1).optional(),
+  "maxSlots": zod.number().min(1).max(updateLocationBodyMaxSlotsMax).optional()
+})
+
+export const UpdateLocationResponse = zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "maxSlots": zod.number(),
+  "createdAt": zod.string()
+})
+
+
 export const DeleteLocationParams = zod.object({
   "id": zod.coerce.number()
 })
 
 
-/**
- * @summary List all schedule sheets
- */
 export const ListSchedulesResponseItem = zod.object({
   "id": zod.number(),
   "title": zod.string(),
@@ -90,9 +95,6 @@ export const ListSchedulesResponseItem = zod.object({
 export const ListSchedulesResponse = zod.array(ListSchedulesResponseItem)
 
 
-/**
- * @summary Create a new schedule sheet
- */
 
 
 
@@ -102,9 +104,6 @@ export const CreateScheduleBody = zod.object({
 })
 
 
-/**
- * @summary Get a schedule sheet with all assignments
- */
 export const GetScheduleParams = zod.object({
   "id": zod.coerce.number()
 })
@@ -127,17 +126,40 @@ export const GetScheduleResponse = zod.object({
 })
 
 
-/**
- * @summary Delete a schedule sheet
- */
 export const DeleteScheduleParams = zod.object({
   "id": zod.coerce.number()
 })
 
 
 /**
- * @summary Assign a member to a location/day slot
+ * @summary Auto-assign members to a location for the week (no duplicates)
  */
+export const AutoAssignParams = zod.object({
+  "scheduleId": zod.coerce.number()
+})
+
+export const AutoAssignBody = zod.object({
+  "locationId": zod.number()
+})
+
+export const AutoAssignResponse = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "weekLabel": zod.string().nullish(),
+  "createdAt": zod.string().optional(),
+  "assignments": zod.array(zod.object({
+  "id": zod.number(),
+  "scheduleId": zod.number(),
+  "memberId": zod.number(),
+  "locationId": zod.number(),
+  "dayOfWeek": zod.number(),
+  "memberName": zod.string(),
+  "memberColor": zod.string().nullish(),
+  "locationName": zod.string()
+}))
+})
+
+
 export const CreateAssignmentParams = zod.object({
   "scheduleId": zod.coerce.number()
 })
@@ -149,9 +171,6 @@ export const CreateAssignmentBody = zod.object({
 })
 
 
-/**
- * @summary Remove a member from a slot
- */
 export const DeleteAssignmentParams = zod.object({
   "scheduleId": zod.coerce.number(),
   "id": zod.coerce.number()
