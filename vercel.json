@@ -1,8 +1,8 @@
 {
   "framework": null,
   "installCommand": "pnpm install --frozen-lockfile",
-  "buildCommand": "pnpm -w run typecheck:libs && BASE_PATH=/ pnpm --filter @workspace/duty-scheduler run build",
-  "outputDirectory": "artifacts/duty-scheduler/dist/public",
+  "buildCommand": "pnpm -w run typecheck:libs && BASE_PATH=/ pnpm --filter @workspace/duty-scheduler run build && mkdir -p public && cp -r artifacts/duty-scheduler/dist/public/. public/",
+  "outputDirectory": "public",
   "rewrites": [
     { "source": "/api/:path*", "destination": "/api/server" }
   ]
