@@ -1,1 +1,2 @@
 - [Expo artifact bootstrap workaround](expo-artifact-bootstrap.md) — how to register an Expo artifact when its directory pre-exists and createArtifact() fails.
+- [Vercel build config](vercel-build-config.md) — vite.config.ts uses process.env.VERCEL to pick outputDir; no cp needed in buildCommand
