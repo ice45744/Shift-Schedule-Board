@@ -6,6 +6,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface HealthStatus {
-  status: string;
+export interface Assignment {
+  id: number;
+  scheduleId: number;
+  memberId: number;
+  locationId: number;
+  dayOfWeek: number;
 }
