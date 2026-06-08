@@ -14,9 +14,12 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": false
+      "supportsTablet": false,
+      "bundleIdentifier": "com.replit.dutyschedulermobile"
     },
-    "android": {},
+    "android": {
+      "package": "com.replit.dutyschedulermobile"
+    },
     "web": {
       "favicon": "./assets/images/icon.png"
     },
