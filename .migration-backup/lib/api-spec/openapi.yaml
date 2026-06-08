@@ -1,0 +1,395 @@
+openapi: 3.1.0
+info:
+  title: Api
+  version: 0.1.0
+  description: Duty scheduler API
+servers:
+  - url: /api
+tags:
+  - name: health
+  - name: members
+  - name: locations
+  - name: schedules
+  - name: assignments
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /members:
+    get:
+      operationId: listMembers
+      tags: [members]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Member"
+    post:
+      operationId: createMember
+      tags: [members]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MemberInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Member"
+
+  /members/{id}:
+    delete:
+      operationId: deleteMember
+      tags: [members]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /locations:
+    get:
+      operationId: listLocations
+      tags: [locations]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Location"
+    post:
+      operationId: createLocation
+      tags: [locations]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LocationInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Location"
+
+  /locations/{id}:
+    patch:
+      operationId: updateLocation
+      tags: [locations]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LocationPatch"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Location"
+    delete:
+      operationId: deleteLocation
+      tags: [locations]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /schedules:
+    get:
+      operationId: listSchedules
+      tags: [schedules]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Schedule"
+    post:
+      operationId: createSchedule
+      tags: [schedules]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ScheduleInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Schedule"
+
+  /schedules/{id}:
+    get:
+      operationId: getSchedule
+      tags: [schedules]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScheduleDetail"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteSchedule
+      tags: [schedules]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /schedules/{scheduleId}/assignments:
+    post:
+      operationId: createAssignment
+      tags: [assignments]
+      parameters:
+        - name: scheduleId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssignmentInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Assignment"
+
+  /schedules/{scheduleId}/assignments/{id}:
+    delete:
+      operationId: deleteAssignment
+      tags: [assignments]
+      parameters:
+        - name: scheduleId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+
+    Member:
+      type: object
+      required: [id, name, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        color:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    MemberInput:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        color:
+          type: string
+
+    Location:
+      type: object
+      required: [id, name, maxSlots, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        maxSlots:
+          type: integer
+        createdAt:
+          type: string
+
+    LocationInput:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        maxSlots:
+          type: integer
+          minimum: 1
+          maximum: 20
+
+    LocationPatch:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        maxSlots:
+          type: integer
+          minimum: 1
+          maximum: 20
+
+    Schedule:
+      type: object
+      required: [id, title, createdAt]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        weekLabel:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    ScheduleInput:
+      type: object
+      required: [title]
+      properties:
+        title:
+          type: string
+          minLength: 1
+        weekLabel:
+          type: string
+
+    ScheduleDetail:
+      type: object
+      required: [id, title, assignments]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        weekLabel:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+        assignments:
+          type: array
+          items:
+            $ref: "#/components/schemas/AssignmentWithDetails"
+
+    Assignment:
+      type: object
+      required: [id, scheduleId, memberId, locationId, dayOfWeek]
+      properties:
+        id:
+          type: integer
+        scheduleId:
+          type: integer
+        memberId:
+          type: integer
+        locationId:
+          type: integer
+        dayOfWeek:
+          type: integer
+
+    AssignmentInput:
+      type: object
+      required: [memberId, locationId, dayOfWeek]
+      properties:
+        memberId:
+          type: integer
+        locationId:
+          type: integer
+        dayOfWeek:
+          type: integer
+
+    AssignmentWithDetails:
+      type: object
+      required: [id, scheduleId, memberId, locationId, dayOfWeek, memberName, locationName]
+      properties:
+        id:
+          type: integer
+        scheduleId:
+          type: integer
+        memberId:
+          type: integer
+        locationId:
+          type: integer
+        dayOfWeek:
+          type: integer
+        memberName:
+          type: string
+        memberColor:
+          type: ["string", "null"]
+        locationName:
+          type: string
