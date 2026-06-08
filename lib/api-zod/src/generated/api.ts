@@ -8,9 +8,6 @@
 import * as zod from 'zod';
 
 
-/**
- * @summary Health check
- */
 export const HealthCheckResponse = zod.object({
   "status": zod.string()
 })
@@ -128,35 +125,6 @@ export const GetScheduleResponse = zod.object({
 
 export const DeleteScheduleParams = zod.object({
   "id": zod.coerce.number()
-})
-
-
-/**
- * @summary Auto-assign members to a location for the week (no duplicates)
- */
-export const AutoAssignParams = zod.object({
-  "scheduleId": zod.coerce.number()
-})
-
-export const AutoAssignBody = zod.object({
-  "locationId": zod.number()
-})
-
-export const AutoAssignResponse = zod.object({
-  "id": zod.number(),
-  "title": zod.string(),
-  "weekLabel": zod.string().nullish(),
-  "createdAt": zod.string().optional(),
-  "assignments": zod.array(zod.object({
-  "id": zod.number(),
-  "scheduleId": zod.number(),
-  "memberId": zod.number(),
-  "locationId": zod.number(),
-  "dayOfWeek": zod.number(),
-  "memberName": zod.string(),
-  "memberColor": zod.string().nullish(),
-  "locationName": zod.string()
-}))
 })
 
 

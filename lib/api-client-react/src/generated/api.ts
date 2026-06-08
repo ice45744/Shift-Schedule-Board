@@ -22,7 +22,6 @@ import type {
 import type {
   Assignment,
   AssignmentInput,
-  AutoAssignInput,
   HealthStatus,
   Location,
   LocationInput,
@@ -54,9 +53,6 @@ export const getHealthCheckUrl = () => {
   return `/api/healthz`
 }
 
-/**
- * @summary Health check
- */
 export const healthCheck = async ( options?: RequestInit): Promise<HealthStatus> => {
 
   return customFetch<HealthStatus>(getHealthCheckUrl(),
@@ -101,9 +97,6 @@ export type HealthCheckQueryResult = NonNullable<Awaited<ReturnType<typeof healt
 export type HealthCheckQueryError = ErrorType<unknown>
 
 
-/**
- * @summary Health check
- */
 
 export function useHealthCheck<TData = Awaited<ReturnType<typeof healthCheck>>, TError = ErrorType<unknown>>(
   options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof healthCheck>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
@@ -858,78 +851,6 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getDeleteScheduleMutationOptions(options));
-    }
-
-export const getAutoAssignUrl = (scheduleId: number,) => {
-
-
-
-
-  return `/api/schedules/${scheduleId}/auto-assign`
-}
-
-/**
- * @summary Auto-assign members to a location for the week (no duplicates)
- */
-export const autoAssign = async (scheduleId: number,
-    autoAssignInput: AutoAssignInput, options?: RequestInit): Promise<ScheduleDetail> => {
-
-  return customFetch<ScheduleDetail>(getAutoAssignUrl(scheduleId),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      autoAssignInput,)
-  }
-);}
-
-
-
-
-export const getAutoAssignMutationOptions = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof autoAssign>>, TError,{scheduleId: number;data: BodyType<AutoAssignInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof autoAssign>>, TError,{scheduleId: number;data: BodyType<AutoAssignInput>}, TContext> => {
-
-const mutationKey = ['autoAssign'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof autoAssign>>, {scheduleId: number;data: BodyType<AutoAssignInput>}> = (props) => {
-          const {scheduleId,data} = props ?? {};
-
-          return  autoAssign(scheduleId,data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type AutoAssignMutationResult = NonNullable<Awaited<ReturnType<typeof autoAssign>>>
-    export type AutoAssignMutationBody = BodyType<AutoAssignInput>
-    export type AutoAssignMutationError = ErrorType<unknown>
-
-    /**
- * @summary Auto-assign members to a location for the week (no duplicates)
- */
-export const useAutoAssign = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof autoAssign>>, TError,{scheduleId: number;data: BodyType<AutoAssignInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
- ): UseMutationResult<
-        Awaited<ReturnType<typeof autoAssign>>,
-        TError,
-        {scheduleId: number;data: BodyType<AutoAssignInput>},
-        TContext
-      > => {
-      return useMutation(getAutoAssignMutationOptions(options));
     }
 
 export const getCreateAssignmentUrl = (scheduleId: number,) => {

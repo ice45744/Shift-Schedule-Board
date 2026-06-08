@@ -99,7 +99,3 @@ export interface AssignmentInput {
   dayOfWeek: number;
 }
 
-export interface AutoAssignInput {
-  locationId: number;
-}
-

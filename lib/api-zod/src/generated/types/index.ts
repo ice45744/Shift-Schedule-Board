@@ -9,7 +9,6 @@
 export * from './assignment';
 export * from './assignmentInput';
 export * from './assignmentWithDetails';
-export * from './autoAssignInput';
 export * from './healthStatus';
 export * from './location';
 export * from './locationInput';

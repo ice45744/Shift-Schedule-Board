@@ -16,7 +16,6 @@ paths:
     get:
       operationId: healthCheck
       tags: [health]
-      summary: Health check
       responses:
         "200":
           description: Healthy
@@ -31,7 +30,7 @@ paths:
       tags: [members]
       responses:
         "200":
-          description: List of members
+          description: OK
           content:
             application/json:
               schema:
@@ -75,7 +74,7 @@ paths:
       tags: [locations]
       responses:
         "200":
-          description: List of locations
+          description: OK
           content:
             application/json:
               schema:
@@ -141,7 +140,7 @@ paths:
       tags: [schedules]
       responses:
         "200":
-          description: List of schedules
+          description: OK
           content:
             application/json:
               schema:
@@ -177,7 +176,7 @@ paths:
             type: integer
       responses:
         "200":
-          description: Schedule with assignments
+          description: OK
           content:
             application/json:
               schema:
@@ -196,31 +195,6 @@ paths:
       responses:
         "204":
           description: Deleted
-
-  /schedules/{scheduleId}/auto-assign:
-    post:
-      operationId: autoAssign
-      tags: [assignments]
-      summary: Auto-assign members to a location for the week (no duplicates)
-      parameters:
-        - name: scheduleId
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/AutoAssignInput"
-      responses:
-        "200":
-          description: Updated schedule detail
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ScheduleDetail"
 
   /schedules/{scheduleId}/assignments:
     post:
@@ -269,10 +243,10 @@ components:
   schemas:
     HealthStatus:
       type: object
+      required: [status]
       properties:
         status:
           type: string
-      required: [status]
 
     Member:
       type: object
@@ -397,13 +371,6 @@ components:
         locationId:
           type: integer
         dayOfWeek:
-          type: integer
-
-    AutoAssignInput:
-      type: object
-      required: [locationId]
-      properties:
-        locationId:
           type: integer
 
     AssignmentWithDetails:
