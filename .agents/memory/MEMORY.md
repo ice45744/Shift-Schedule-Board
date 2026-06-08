@@ -1,0 +1,1 @@
+- [Expo artifact bootstrap workaround](expo-artifact-bootstrap.md) — how to register an Expo artifact when its directory pre-exists and createArtifact() fails.
