@@ -11,7 +11,7 @@ import {
   getGetScheduleQueryKey,
 } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
-import { X, CalendarDays, ChevronDown, Check, Settings, Wand2, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, CalendarDays, ChevronDown, Check, Settings, Wand2, ChevronLeft, ChevronRight, PanelRightClose, PanelRightOpen } from "lucide-react";
 import { playDropSound, playRemoveSound, playSuccessSound } from "@/lib/audio";
 import { motion, AnimatePresence } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -35,7 +35,8 @@ export default function SchedulePage() {
   const { data: schedules, isLoading: isLoadingSchedules } = useListSchedules();
   const [selectedScheduleId, setSelectedScheduleId] = useState<number | null>(null);
   const [popoverOpen, setPopoverOpen] = useState(false);
-  const [mobileDay, setMobileDay] = useState(1); // which day is shown on mobile
+  const [mobileDay, setMobileDay] = useState(1);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const [dragOverRow, setDragOverRow] = useState<string | null>(null);
   const dragCounters = useRef<Record<string, number>>({});
@@ -217,12 +218,24 @@ export default function SchedulePage() {
           )}
         </div>
 
-        <Link href="/settings">
-          <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground text-xs">
-            <Settings className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">ตั้งค่า</span>
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-muted-foreground hover:text-foreground"
+            onClick={() => setSidebarOpen((o) => !o)}
+            title={sidebarOpen ? "ซ่อนสมาชิก" : "แสดงสมาชิก"}
+            data-testid="button-toggle-sidebar"
+          >
+            {sidebarOpen ? <PanelRightClose className="w-4 h-4" /> : <PanelRightOpen className="w-4 h-4" />}
           </Button>
-        </Link>
+          <Link href="/settings">
+            <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground text-xs">
+              <Settings className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">ตั้งค่า</span>
+            </Button>
+          </Link>
+        </div>
       </header>
 
       {/* ── Mobile day navigator ── */}
@@ -473,35 +486,51 @@ export default function SchedulePage() {
         </div>
 
         {/* ── Members Sidebar ── */}
-        <aside className="w-44 sm:w-52 bg-background border-l shrink-0 flex flex-col">
-          <div className="px-3 py-2.5 border-b bg-muted/20">
-            <p className="font-semibold text-xs sm:text-sm">สมาชิก</p>
-            <p className="text-[10px] text-muted-foreground mt-0.5 hidden sm:block">ลากชื่อไปวางในแถว</p>
-          </div>
-          <div className="flex-1 overflow-y-auto p-2 space-y-1">
-            {isLoadingMembers ? (
-              Array(5).fill(0).map((_, i) => <Skeleton key={i} className="h-8 w-full rounded-lg" />)
-            ) : members?.length === 0 ? (
-              <p className="text-[11px] text-muted-foreground text-center p-3 border-2 border-dashed rounded-lg mt-2">
-                ยังไม่มีสมาชิก
-              </p>
-            ) : (
-              members?.map((member) => (
-                <div
-                  key={member.id}
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, member.id)}
-                  onDragEnd={handleDragEnd}
-                  className="flex items-center gap-2 px-2.5 py-2 rounded-lg border bg-card shadow-sm cursor-grab active:cursor-grabbing hover:border-primary/60 transition-all select-none"
-                  data-testid={`chip-member-${member.id}`}
-                >
-                  <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: member.color ?? "#888" }} />
-                  <span className="text-xs font-medium truncate">{member.name}</span>
+        <AnimatePresence initial={false}>
+          {sidebarOpen && (
+            <motion.aside
+              key="sidebar"
+              initial={{ width: 0, opacity: 0 }}
+              animate={{ width: "auto", opacity: 1 }}
+              exit={{ width: 0, opacity: 0 }}
+              transition={{ duration: 0.22, ease: "easeInOut" }}
+              className="bg-background border-l shrink-0 flex flex-col overflow-hidden"
+              style={{ minWidth: sidebarOpen ? 176 : 0 }}
+            >
+              <div className="w-44 sm:w-52 flex flex-col flex-1 overflow-hidden">
+                <div className="px-3 py-2.5 border-b bg-muted/20 flex items-center justify-between">
+                  <div>
+                    <p className="font-semibold text-xs sm:text-sm whitespace-nowrap">สมาชิก</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5 hidden sm:block">ลากชื่อไปวางในแถว</p>
+                  </div>
                 </div>
-              ))
-            )}
-          </div>
-        </aside>
+                <div className="flex-1 overflow-y-auto p-2 space-y-1">
+                  {isLoadingMembers ? (
+                    Array(5).fill(0).map((_, i) => <Skeleton key={i} className="h-8 w-full rounded-lg" />)
+                  ) : members?.length === 0 ? (
+                    <p className="text-[11px] text-muted-foreground text-center p-3 border-2 border-dashed rounded-lg mt-2">
+                      ยังไม่มีสมาชิก
+                    </p>
+                  ) : (
+                    members?.map((member) => (
+                      <div
+                        key={member.id}
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, member.id)}
+                        onDragEnd={handleDragEnd}
+                        className="flex items-center gap-2 px-2.5 py-2 rounded-lg border bg-card shadow-sm cursor-grab active:cursor-grabbing hover:border-primary/60 transition-all select-none"
+                        data-testid={`chip-member-${member.id}`}
+                      >
+                        <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: member.color ?? "#888" }} />
+                        <span className="text-xs font-medium truncate">{member.name}</span>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </motion.aside>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
